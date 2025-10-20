@@ -1,23 +1,25 @@
-FROM codercom/code-server:latest
+FROM gitpod/openvscode-server:latest  
 
-COPY dolphindb-vscode-v3.0.405.vsix /tmp/plugin.vsix
+ENV OPENVSCODE_SERVER_ROOT="/home/.openvscode-server"  
+ENV OPENVSCODE="${OPENVSCODE_SERVER_ROOT}/bin/openvscode-server"  
 
-# 写 config.yaml
-RUN mkdir -p /home/coder/.config/code-server && \
-    cat <<EOF > /home/coder/.config/code-server/config.yaml
-bind-addr: 0.0.0.0:8080
-auth: none
-cert: false
-EOF
+USER root  
 
-# 安装 DolphinDB 插件（假设插件 ID 正确）
-RUN  code-server --install-extension /tmp/plugin.vsix
+# 复制并安装插件  
+COPY dolphindb-vscode-v3.0.405.vsix /tmp/plugin.vsix  
+RUN ${OPENVSCODE} --install-extension /tmp/plugin.vsix  
 
-USER root
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
+# 创建并设置 workspace 目录权限  
+RUN mkdir -p /workspace && \  
+    chown -R openvscode-server:openvscode-server /workspace  
 
-USER coder
+# 设置 entrypoint  
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh  
+RUN chmod +x /usr/local/bin/entrypoint.sh  
+
+RUN mkdir -p /home/workspace && \  
+    chown -R openvscode-server:openvscode-server /home/workspace  
+
+USER openvscode-server  
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-

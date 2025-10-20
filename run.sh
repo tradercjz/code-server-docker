@@ -1,0 +1,1 @@
+docker run -it -d -p 3003:3000 -e DDB_HOST=183.134.101.139 -e DDB_PORT=8892 openvscode-server-ddb:latest
