@@ -1,0 +1,42 @@
+version: '3.7'
+
+services:
+  nginx:
+    image: nginx:stable-alpine
+    container_name: nginx_proxy
+    restart: unless-stopped
+    ports:
+      - "8443:8443" 
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./certs/my.service.com.crt:/etc/nginx/certs/my.service.com.crt:ro
+      - ./certs/my.service.com.key:/etc/nginx/certs/my.service.com.key:ro
+    depends_on:
+      - codeserver
+    networks:
+      - codenet
+
+  codeserver:
+    image: codeserver-ddb:latest
+    container_name: codeserver
+    restart: unless-stopped
+    ports:
+      - "3004:3000"
+    environment:
+      - DDB_HOST=183.134.101.139
+      - DDB_PORT=8892
+      - DDB_USER=admin
+      - DDB_PASS=mile660
+      - PORT=3000
+      - PROXY_DOMAIN=my.service.com  # 完整的代理 URL
+    volumes:
+      - workspace_data:/workspace
+    networks:
+      - codenet
+
+networks:
+  codenet:
+    driver: bridge
+
+volumes:
+  workspace_data:

@@ -1,0 +1,20 @@
+[req]
+default_bits = 2048
+prompt = no
+default_md = sha256
+x509_extensions = v3_req
+distinguished_name = dn
+
+[dn]
+C = CN                # 国家代码
+ST = Zhejiang     # 省份
+L = Hangzhou          # 城市
+O = DolphinDB      # 组织名称
+OU = OpenVSCode       # 组织单位
+CN = 183.134.101.139  # 证书通用名称
+
+[v3_req]
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+extendedKeyUsage = serverAuth
+# 关键：将您的 IP 地址添加到 SAN 列表
+subjectAltName = DNS:my.lan, IP:183.134.101.139  # 保持 IP 以供参考，但重点在 DNS

@@ -2,7 +2,7 @@
 set -e  
   
 # OpenVSCode Server 的用户配置目录  
-USER_CONFIG_DIR="/home/workspace/.openvscode-server/data/Machine"  
+USER_CONFIG_DIR="/home/openvscode-server/.openvscode-server/data/Machine"  
 mkdir -p "$USER_CONFIG_DIR"  
   
 # 动态生成 settings.json  
@@ -19,10 +19,16 @@ cat > "$USER_CONFIG_DIR/settings.json" <<EOF
   ]  
 }  
 EOF
-  
+
+
+chown -R openvscode-server:openvscode-server /workspace
+chown -R openvscode-server:openvscode-server /home/workspace
+chown -R openvscode-server:openvscode-server /home/.openvscode-server
+
 # 启动 OpenVSCode Server  
-exec /home/.openvscode-server/bin/openvscode-server \
+exec gosu openvscode-server /home/.openvscode-server/bin/openvscode-server \
   --host 0.0.0.0 \
   --port ${PORT:-3000} \
   --without-connection-token \
-  --default-folder /workspace
+  --default-folder /workspace \
+  --log trace

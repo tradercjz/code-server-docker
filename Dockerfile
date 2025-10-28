@@ -1,25 +1,38 @@
-FROM gitpod/openvscode-server:latest  
+FROM codercom/code-server:latest
 
-ENV OPENVSCODE_SERVER_ROOT="/home/.openvscode-server"  
-ENV OPENVSCODE="${OPENVSCODE_SERVER_ROOT}/bin/openvscode-server"  
+USER root
 
-USER root  
+# 设置国内镜像源 (阿里云)
+RUN echo "deb http://mirrors.aliyun.com/debian/ bookworm main contrib non-free non-free-firmware\n\
+deb http://mirrors.aliyun.com/debian/ bookworm-updates main contrib non-free non-free-firmware\n\
+deb http://mirrors.aliyun.com/debian/ bookworm-backports main contrib non-free non-free-firmware\n\
+deb http://mirrors.aliyun.com/debian-security bookworm-security main contrib non-free non-free-firmware" \
+    > /etc/apt/sources.list && \
+    apt-get update && \
+    apt-get install -y gosu && \
+    rm -rf /var/lib/apt/lists/*
+    
+# 写 config.yaml
+RUN mkdir -p /home/coder/.config/code-server && \
+    cat <<EOF > /home/coder/.config/code-server/config.yaml
+bind-addr: 0.0.0.0:3000
+auth: none
+cert: false
+EOF
 
-# 复制并安装插件  
-COPY dolphindb-vscode-v3.0.405.vsix /tmp/plugin.vsix  
-RUN ${OPENVSCODE} --install-extension /tmp/plugin.vsix  
+# 复制并安装 DolphinDB 插件
+COPY dolphindb-vscode-v3.0.405.vsix /tmp/plugin.vsix
+USER coder
+RUN code-server --install-extension /tmp/plugin.vsix 
+USER root
+RUN rm /tmp/plugin.vsix
 
-# 创建并设置 workspace 目录权限  
-RUN mkdir -p /workspace && \  
-    chown -R openvscode-server:openvscode-server /workspace  
+# 创建工作目录
+RUN mkdir -p /workspace && \
+    chown -R coder:coder /workspace
 
-# 设置 entrypoint  
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh  
-RUN chmod +x /usr/local/bin/entrypoint.sh  
-
-RUN mkdir -p /home/workspace && \  
-    chown -R openvscode-server:openvscode-server /home/workspace  
-
-USER openvscode-server  
-
+# 设置 entrypoint
+COPY entrypoint-codeserver.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+EXPOSE 3000
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

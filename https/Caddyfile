@@ -1,0 +1,11 @@
+https://183.134.101.139 {
+    reverse_proxy 127.0.0.1:3000
+    
+
+    # 如果 webview 请求被拦，可以放宽头部
+    header {
+        Access-Control-Allow-Origin *
+        Access-Control-Allow-Headers *
+        Access-Control-Allow-Methods *
+    }
+}

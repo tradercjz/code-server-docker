@@ -1,0 +1,20 @@
+# 全局配置，开启 DEBUG 日志以便最后检查
+{
+    log {
+        level debug
+    }
+}
+
+my.service.com:8443 {
+    tls /certs/my.service.com.crt /certs/my.service.com.key
+    log
+    reverse_proxy openvscode:3000
+}
+
+# 【新增回退】：强制 Caddy 在 IP 匹配时，也使用这个域名证书。
+# Caddy 会优先匹配 my.service.com，匹配不到就退到这个 IP 匹配。
+183.134.101.139:8443 {
+    tls /certs/my.service.com.crt /certs/my.service.com.key
+    log
+    reverse_proxy openvscode:3000
+}

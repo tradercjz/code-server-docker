@@ -1,0 +1,45 @@
+version: "3.7"
+
+services:
+  # OpenVSCode Server 服务 (保持不变)
+  openvscode:
+    image: gitpod/openvscode-server:latest
+    container_name: openvscode-server
+    restart: unless-stopped
+    environment:
+      - CONNECTION_TOKEN=your_strong_secret_token
+    volumes:
+      - ./workspace:/home/workspace:cached
+      - ./openvscode-data:/home/.local/share/code-server 
+    networks:
+      - caddy_network
+
+  # Caddy 反向代理服务
+  caddy:
+    image: caddy:2.8.4
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      # 映射外部 8443 端口到容器的 8443 端口 (用于 HTTPS)
+      - "8443:8443"
+      # 可选：如果你不需要 HTTP 访问，可以移除 80 端口映射
+      - "80:80" 
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./caddy_data:/data
+      # 挂载自签名证书和私钥到 Caddy 容器内部
+      - ./tls.crt:/etc/caddy/tls.crt 
+      - ./tls.key:/etc/caddy/tls.key
+    networks:
+      - caddy_network
+
+# 定义 Docker 网络
+networks:
+  caddy_network:
+    driver: bridge
+
+# 定义持久化存储卷
+volumes:
+  caddy_data:
+  workspace:
+  openvscode-data:

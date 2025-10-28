@@ -1,0 +1,18 @@
+# 监听公网 IP 和端口
+my.lan:8443 {
+    # 强制 Caddy 使用手动提供的证书文件
+    tls /etc/caddy/tls.crt /etc/caddy/tls.key 
+
+
+    # 反向代理到 openvscode-server 容器的 3000 端口
+    reverse_proxy openvscode:3000 {
+        # 保持 WebSocket 连接
+        header_up Upgrade {http.request.header.Upgrade}
+        header_up Connection {http.request.header.Connection}
+    }
+    
+    # 可选: 启用日志
+    log {
+        level debug
+    }
+}
