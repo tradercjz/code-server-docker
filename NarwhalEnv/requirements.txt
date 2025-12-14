@@ -1,0 +1,25 @@
+pydantic
+python-dotenv
+openai
+jinja2
+dolphindb
+fastapi
+transformers
+dashscope
+python-jose[cryptography]  # JWT 处理
+passlib[bcrypt]            # 密码哈希
+aiosmtplib                 # 异步邮件发送
+sqlalchemy                 # ORM
+alembic                    # 数据库迁移 (可选，建议加上)
+pydantic-settings          # 配置管理
+loguru
+aiofiles
+python-frontmatter
+jieba
+rank_bm25
+pydantic[email]
+aiosqlite
+python-multipart
+duckdb
+langchain_text_splitters
+uvicorn
