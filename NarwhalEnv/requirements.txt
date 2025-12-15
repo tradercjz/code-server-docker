@@ -25,3 +25,4 @@ langchain_text_splitters
 uvicorn
 passlib[argon2]
 argon2-cffi
+kubernetes
