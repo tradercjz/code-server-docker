@@ -22,7 +22,8 @@ aiosqlite
 python-multipart
 duckdb
 langchain_text_splitters
-uvicorn
+uvicorn[standard]
 passlib[argon2]
 argon2-cffi
 kubernetes
+websockets
